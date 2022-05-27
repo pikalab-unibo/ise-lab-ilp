@@ -17,8 +17,8 @@
 \newcommand{\versionpatch}{1}
 \newcommand{\version}{\versionmajor.\versionminor.\versionpatch}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title[\currentLab{} -- Short Title]{
-	Long Title
+\title[\currentLab{} -- Symbolic ML \& ILP]{
+	Symbolic Machine Learning and Inductive Logic Programming
 }
 %
 \subtitle{\courseName{} / Module \moduleN{} (\courseAcronym)}
@@ -118,11 +118,12 @@
 %%%%
 \setbeamertemplate{page number in head/foot}{}
 %/////////
-\begin{frame}[c,noframenumbering]{\refname}
-%\begin{frame}[t,allowframebreaks,noframenumbering]{\refname}
+% \begin{frame}[c,noframenumbering]{\refname}
+\begin{frame}[t,allowframebreaks,noframenumbering]{\refname}
 %	\tiny
 	\scriptsize
 %	\footnotesize
+	\nocite{*}
 	\bibliographystyle{apalike-AMS}
 	\bibliography{ise-lab-ilp}
 \end{frame}
