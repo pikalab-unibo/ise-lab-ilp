@@ -131,8 +131,12 @@
             \item Two major (partially overlapping) branches:
             %
             \begin{itemize}
-                \item inductive logic programming (ILP) \cite{Muggleton1991}
-                \item statistical relational learning (SRL) \cite{DeRaedt2010,RaedtK04}
+                \item inductive logic programming\ccite{Muggleton1991} (ILP)
+                \item statistical relational learning\ccite{DeRaedt2010} (SRL)
+                %
+                \begin{itemize}
+                    \item[aka] \emph{probabilistic} inductive logic programming\ccite{RaedtK04}
+                \end{itemize}
             \end{itemize}
         \end{itemize}
     \end{block}
@@ -173,16 +177,6 @@
             \end{itemize}
         \end{itemize}
     \end{block}
-
-    \begin{block}{Learning as search}
-        Both in structure and parameter learning
-        %
-        \begin{itemize}
-            \item the goals is \alert{searching} for some \alert{optimal} theory $H^*$\ldots
-            \item \ldots among a set of admissible hypotheses $\mathcal{H}$
-            \item assumptions are commonly made on the admissible shapes all $H \in \mathcal{H}$
-        \end{itemize}
-    \end{block}
 \end{frame}
 
 \begin{frame}[allowframebreaks]
@@ -211,20 +205,204 @@
     \end{exampleblock}
 \end{frame}
 
+\begin{frame}[allowframebreaks]
+    \frametitle{Learning as Search}
+
+    Both in structure and parameter learning:
+    %
+    \bigskip
+    %
+    \begin{itemize}
+        \item the goals is \alert{finding} some \alert{optimal} theory $H^*$\ldots
+        %
+        \begin{itemize}
+            \item which implies \alert{searching}
+            \item following an \alert{optimility criterion}
+        \end{itemize}
+
+        \bigskip
+
+        \item \ldots among a set of admissible hypotheses $\mathcal{H}$ (a.k.a. \alert{hypotheses space})
+        %
+        \begin{itemize}
+            \item containing of admissible \alert{logic theories}
+        \end{itemize}
+
+        \bigskip
+
+        \item under \alert{given assumptions} on the admissible shapes all $H \in \mathcal{H}$ 
+    \end{itemize}
+
+    \framebreak
+
+    \begin{block}{The set of all possible logic theories is \textbf{infinite}}
+        E.g., in the case of \alert{Horn logic}, many sources of \emph{infiniteness}:
+        %
+        \begin{itemize}
+            \item infinitely many terms (as soon as $n$-ary functors are used)
+            \item infinitely many ways to apply $m$-ary predications to those terms
+            \item infinitely many ways to combine predicates into clauses
+            \item[$\vdots$]
+            %
+            \medskip
+            %
+            \item[$\rightarrow$] need to $\begin{cases}
+                \text{``reduce the size of'' (a.k.a. sample) of } \mathcal{H}
+                \\
+                \text{engineer a smart exploration strategy}
+            \end{cases}$
+        \end{itemize}
+    \end{block}
+
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+    \frametitle{The Notion of Linguistic Bias}
+
+    \begin{block}{Informal definition}
+        A set of constraints on the form of the theories in the hypotheses space
+    \end{block}
+
+    \begin{exampleblock}{Example of linguistic bias for \textbf{parameter} learning}
+        \begin{itemize}
+            \item e.g. \alert{logic programs with annotated disjunctions}\ccite{Vennekens2004} (LPAD), where each clause is of the form:
+            %
+            \[ \alert{p_1} :: h_1(\bar{X}) \alert{\vee} \ldots \alert{\vee} \alert{p_m} :: h_m(\bar{X}) \leftarrow f(\bar{X}) \wedge f'(\bar{X}') \wedge f''(\bar{X}''),\ \ldots \]
+            %
+            where $\frac{p_i}{\sum_j^{m} p_j}$ is the probability of predicate $h_i(\bar{X})$ being true
+        \end{itemize}
+    \end{exampleblock}
+
+    \begin{exampleblock}{Examples of linguistic bias for \textbf{structure} learning}
+        \begin{itemize}
+            \item[e.g.] no functors, only constants + predications of arity $\leq ~ m$
+            \item[e.g.] mode declaration\ccite{Muggleton95} (i.e. predicates names and types)
+            \item[e.g.] meta rules (i.e. $2^{nd}$-order rules with $2^{nd}$-order variables):
+            %
+            \[ \mathbf{P}(A,\ B) \leftarrow \mathbf{Q}(A,\ C) \wedge \mathbf{R}(C,\ B) \]
+            %
+            where $\mathbf{P}, \mathbf{Q}, \mathbf{R}$ range over predicate symbols
+        \end{itemize}
+    \end{exampleblock}
+\end{frame}
+
 %===============================================================================
 \section{Inductive Logic Programming}
 %===============================================================================
 
-\startExercise
-
-\begin{frame}{\currentExercise{} -- First Exercise}
-    \begin{block}{Goal}
-        Goal here
-    \end{block}
+\begin{frame}{Formulation}
+    Let
     %
     \begin{itemize}
-        \item further info here
+        \item[$B$] be the \alert{background knowledge}, i.e. a theory of known clauses
+        \item[$E^+$] be a set of \alert{positive examples}, i.e. a theory of ground, \alert{true} facts
+        \item[$E^-$] be a set of \alert{negative examples},  i.e. a theory of ground, \alert{false} facts
+        \item[$C$] be a set of constraints (determining the \alert{linguistic bias})
+        \item[$\mathcal{H}$] be the set of theories (acting as \alert{hypotheses space})
+        %
+        \begin{itemize}
+            \item spawned by the constants, functors, and predicate symbols in $B \cup E^+ \cup E^-$, coherently w.r.t. the constraints in $C$
+        \end{itemize}
     \end{itemize}
+    %
+    then ILP is the problem of computing the \emph{minimal} $H^*$ such that:
+    %
+    \[ H^* = \argmax{H \in \mathcal{H} ~ \text{s.t.} ~ \rho(E^-, H \cup B) = 0}{\rho(E^+, H \cup B)} \]
+    %
+    where \alert{$\rho(E, K)$} the \alert{coverage} function defined as follows:
+    %
+    \[ 
+        \rho(e, K) = \begin{cases}
+            1 & \text{if} ~ K \models e
+            \\
+            0 & \text{otherwise}
+        \end{cases}
+        \quad \text{and} \quad
+        \rho(E, K) = \sum_{e \in E} \rho(e, K)
+    \]
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+    \frametitle{Search strategies for ILP}
+    \begin{block}{Top-down}
+        \begin{enumerate}
+            \item start from a \alert{general} form 
+            \item \alert{specialize} it a bit
+            \item modify it a bit
+            \item repeat until sufficiently specialised
+        \end{enumerate}
+        \medskip
+        Risks: \alert{over-fitting}, search space explosion
+    \end{block}
+
+    \begin{exampleblock}{Example of specialization}
+        \begin{center}
+            $\mathbf{P}(A,\ B) \leftarrow \mathbf{Q}(A,\ C) \wedge \mathbf{R}(C,\ B)$
+
+            \qquad \qquad $\Downarrow$ { \tiny $[\mathbf{P} = \textit{grand\_parent}, \mathbf{Q} = \mathbf{R} = \textit{parent}]$}
+
+            $\textit{grand\_parent}(A,\ B) \leftarrow \textit{parent}(A,\ C) \wedge \textit{parent}(C,\ B)$
+        \end{center}
+    \end{exampleblock}
+
+    \begin{block}{Bottom-up}
+        \begin{enumerate}
+            \item start from a very \alert{specific} form
+            \item \alert{generalise} it a bit
+            \item modify it a bit
+            \item repeat until sufficiently general
+        \end{enumerate}
+        \medskip
+        Risks: inducing useless clauses 
+    \end{block}
+
+    \begin{exampleblock}{Example of generalization}
+        \begin{center}\footnotesize
+            $\textit{grand\_parent}(\texttt{abraham},\ \texttt{bart}) \leftarrow \textit{parent}(\texttt{abraham},\ \texttt{homer}) \wedge \textit{parent}(\texttt{homer},\ \texttt{bart})$
+            
+            \normalsize
+            \qquad \qquad $\Downarrow$ { \tiny $[\texttt{abraham} = A, \texttt{bart} = B, \texttt{homer} = C]$}
+
+            $\textit{grand\_parent}(A,\ B) \leftarrow \textit{parent}(A,\ C) \wedge \textit{parent}(C,\ B)$
+        \end{center}
+    \end{exampleblock}
+
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+    \frametitle{Approaches and Mechanisms for ILP\ccite{CropperD2020}}
+
+    \begin{block}{Relative Least-General Generalization (RLGG) \cite{Buntine88}}
+        \begin{itemize}
+            \item Exploration strategy: bottom-up
+            \item Basic mechanism: \alert{least-general generalization}\ccite{Plotkin1971}
+            \item Example algorithms: Golem\ccite{MuggletonF1990}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Inverse Entailment \cite{Muggleton95}}
+        \begin{itemize}
+            \item Exploration strategy: top-down + bottom-up
+            \item Basic mechanism: \alert{bottom clause construction}\ccite{Muggleton95}
+            \item Example algorithms: Progol\ccite{Muggleton95}, Aleph\ccite{aleph}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Bottom Clause Propositionalisation \cite{Franca2014}}
+        \begin{itemize}
+            \item Exploration strategy: bottom-up
+            \item Basic mechanism: \alert{bottom clause propositionalisation}\ccite{Franca2014} + neural networks training \& reverse-engineering
+            \item Example algorithms: C-IL$^2$P\ccite{GarcezZ99} and CILP++\ccite{Franca2014}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Meta-Interpretative Learning \cite{MuggletonLPT14}}
+        \begin{itemize}
+            \item Exploration strategy: bottom-up
+            \item Basic mechanism: \alert{generate and test} + (Prolog) \alert{meta-interpreter}
+            \item Example algorithms: Metagol\ccite{MuggletonLT15}
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 %===============================================================================
