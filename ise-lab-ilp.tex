@@ -12,9 +12,9 @@
 \usepackage{ise-lab-common}
 \usepackage{ise-lab-ilp}
 % version
-\newcommand{\versionmajor}{0}
-\newcommand{\versionminor}{1}
-\newcommand{\versionpatch}{1}
+\newcommand{\versionmajor}{1}
+\newcommand{\versionminor}{0}
+\newcommand{\versionpatch}{0}
 \newcommand{\version}{\versionmajor.\versionminor.\versionpatch}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title[\currentLab{} -- Symbolic ML \& ILP]{
@@ -410,16 +410,76 @@
 
     \begin{itemize}
         \item \alert{Robustness} w.r.t. noise (a.k.a. wrong examples or background knowledge)
+        \bigskip
         \item \alert{Optimality} (a.k.a. minimality of the induced theory)
+        \bigskip
         \item Support for \alert{infinite domains}
+        \bigskip
         \item Support for \alert{recursion} in induced theories
+        \bigskip
         \item Support for \alert{predicate invention}\ccite{Buntine88}
     \end{itemize}
 \end{frame}
 
+\begin{frame}%[allowframebreaks]
+\frametitle{Predicate ... Invention?!}
+\label{slide:pi}
+
+    \begin{block}{Insight}
+        \begin{itemize}
+            \item \textbf{What:} inventing \emph{auxiliary} predicate symbols
+            %
+            \begin{itemize}
+                \item different from those used by positive examples
+            \end{itemize}
+            \item \textbf{Why:} code reuse, improving readability of induced theories
+            \item \textbf{When:} either during induction or after it
+            \item \textbf{How:} multiple strategies (see below)
+        \end{itemize}
+    \end{block}
+
+\end{frame}
+
+\begin{frame}{Example -- Grouping Common Literals}
+
+    \begin{block}{Theory without predicate invention}%\scriptsize
+        \begin{itemize}
+            \item \texttt{a(A, B) :- b1(A), \alert{c(A, B, C), d(C)}.}
+            \item \texttt{a(A, B) :- b2(A), \alert{c(A, B, C), d(C)}.}
+        \end{itemize}
+    \end{block}
+
+    \begin{exampleblock}{Theory with predicate invention}
+        \begin{itemize}
+            \item \texttt{a(A, B) :- b1(A), invented(A, B, C).}
+            \item \texttt{a(A, B) :- b2(A), invented(A, B, C).}
+            \item \texttt{invented(A, B, C) :- \alert{c(A, B, C), d(C)}.}
+        \end{itemize}
+    \end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{Example -- Grouping Non-Common Literals}
+
+    \begin{block}{Theory without predicate invention}%\scriptsize
+        \begin{itemize}
+            \item \texttt{a(A, B) :- \alert{b1(A)}, c(A, B, C), d(C).}
+            \item \texttt{a(A, B) :- \alert{b2(A)}, c(A, B, C), d(C).}
+        \end{itemize}
+    \end{block}
+    
+    \begin{exampleblock}{Theory with predicate invention}%\scriptsize
+        \begin{itemize}
+            \item \texttt{f(A, B) :- invented(A), c(A, B, C), d(C).}
+            \item \texttt{invented(A) :- \alert{b1(A)}.}
+            \item \texttt{invented(A) :- \alert{b2(A)}.}
+        \end{itemize}
+    \end{exampleblock} 
+\end{frame}
+
 \subsection{Meta-Interpretative Learning}
 
-\begin{frame}{Meta-Interpretative Learning\ccite{MuggletonLT15} (MIL)}
+\begin{frame}[allowframebreaks]{MIL through Metagol\ccite{MuggletonLT15}}
     \begin{itemize}
         \item Didactic, yet powerful approach, for ILP
         %
@@ -427,7 +487,7 @@
             \item straightforward support for minimality, infinite domains, recursion, and predicate invention
         \end{itemize}
         
-        \vfill
+        \bigskip
 
         \item leveraging on $2^{nd}$-order clauses (i.e. \alert{meta-rules}) as linguistic bias
         %
@@ -435,7 +495,7 @@
             \item intuitive, and expressive means to control the search space
         \end{itemize}
         
-        \vfill
+        \bigskip
 
         \item leveraging on a \alert{logic solver} to test hypotheses
         %
@@ -443,14 +503,43 @@
             \item commonly, a meta-interpreter (as it is implemented on top of Prolog)
         \end{itemize}
 
-        \vfill
+        \bigskip
 
         \item most famous implementation is Metagol\ccite{Buntine88}
         %
         \begin{itemize}
-            \item coming with a Prolog-based implementation\uurl{https://github.com/metagol/metagol}
+            \item coming with a Prolog-based implementation \uurl{https://github.com/metagol/metagol}
         \end{itemize}
     \end{itemize}
+
+    \framebreak
+
+    \begin{block}{Properties of Metagol}
+        \begin{itemize}
+            \item[$\times$] \alert{Robustness} w.r.t. noise
+            \item[$\checkmark$] \alert{Minimality} of the induced theory
+            %
+            \begin{itemize}
+                \item via iteratively deepening depth-first search (IDDFS)
+            \end{itemize}
+            \item[$\checkmark$] Support for \alert{infinite domains}
+            %
+            \begin{itemize}
+                \item no need to generate all possible variable instantiation
+                \item (depending on which logic solver is adopted behind the scenes)
+            \end{itemize}
+            \item[$\checkmark$] Support for \alert{recursion} in induced theories
+            %
+            \begin{itemize}
+                \item via recursive meta-rules
+            \end{itemize}
+            \item[$\checkmark$] Support for \alert{predicate invention}
+            %
+            \begin{itemize}
+                \item as the algorithm may `invent' (and use) random predicate symbols along the way
+            \end{itemize}
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 \begin{frame}{Formal Metagol (reverse-engineered\ccite{Cropper2020a})}
@@ -467,6 +556,124 @@
     \prologimport{listings/last-input.pl}
     \framebreak
     \prologimport[basicstyle=\scriptsize\ttfamily]{listings/last-execution.pl}
+\end{frame}
+
+\begin{frame}{Discussion}
+    \begin{itemize}
+        \item Exploration of the hypotheses space is example-driven
+        \item IDDFS is what brings minimality of the induced theory
+        \item Induction of recursive clauses is enabled/disabled by meta-rules
+        \item Hypothesis testing performed via Prolog (that's the implementation tech.)
+        \item Predicate invention wasn't exemplified
+        \item The formulation is non-deterministic!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Pluggable aspects\ccite{Nannini2021}}
+    \begin{block}{Generalization}
+        Turning a specific ($\approx$ ground) rule into a general one ($\approx$ with variables)
+    \end{block}
+    \begin{exampleblock}{Approach 1 -- Constants to variables}
+        \begin{center}\ttfamily\small
+            last([1,2], 2) :- tail([1,2], [2]), last([2], 2)
+
+            $\qquad \Downarrow$ {\footnotesize $\{ \texttt{1}/X, \texttt{2}/Y, \texttt{[]}/Z \}$}
+
+            last([X, Y | Z], Y) :- tail([X, Y | Z], [Y | Z]), last([Y | Z], Y)
+        \end{center}
+    \end{exampleblock}
+    \framebreak
+    \begin{exampleblock}{Approach 2 -- Constants to variables, except empty lists}
+        \begin{center}\ttfamily\small
+            last([1,2], 2) :- tail([1,2], [2]), last([2], 2)
+
+            $\qquad \Downarrow$ {\footnotesize $\{ \texttt{1}/X, \texttt{2}/Y \}$}
+
+            last([X, Y], Y) :- tail([X, Y], [Y]), last([Y], Y)
+        \end{center}
+    \end{exampleblock}
+    \begin{exampleblock}{Approach 3 -- Ground terms to variables, except empty lists}
+        \begin{center}\ttfamily\small
+            last([1,2], 2) :- tail([1,2], [2]), last([2], 2)
+
+            $\qquad \Downarrow$ {\footnotesize $\{ \texttt{[1,2]}/X, \texttt{2}/Y, \texttt{[2]}/Z \}$}
+
+            last(X, Y) :- tail(X, Z), last(Z, Y)
+        \end{center}
+    \end{exampleblock}
+
+    \framebreak
+
+    \begin{block}{Pruning}
+        Removing correct -- yet semantically useless -- clauses
+    \end{block}
+
+	\begin{exampleblock}{Example -- Induced \texttt{append/3} with redundant clauses}\scriptsize
+        \begin{itemize}
+            \item \texttt{append([], A, A).}
+            \item \alert{\texttt{append([A | As], [], [A | As]) :- append(As, [], As).}}
+            \item \alert{\texttt{append([A | As], B, [A | B]) :- append([], B, B).}}
+            \item \texttt{append([A | As], B, [A | Cs]) :- append(As, B, Cs).}
+        \end{itemize}
+    \end{exampleblock}
+
+    \begin{exampleblock}{Example -- Same theory after Occamistic validation\ccite{Nannini2021}}\scriptsize
+        \begin{itemize}
+            \item \texttt{append([], A, A).}
+            \item \texttt{append([A | As], B, [A | Cs]) :- append(As, B, Cs).}
+        \end{itemize}
+    \end{exampleblock}
+
+    \framebreak
+
+    \begin{block}{Syntactic Sugar}
+        Rewriting clauses to make them more user-friendly
+    \end{block}
+
+    \begin{exampleblock}{Example}\scriptsize
+        \begin{itemize}
+            \item \texttt{last(L, X) :- tail(L, []), head(L, X).}
+            \item \texttt{last(L, X) :- tail(L, T), last(T, X).}
+            %
+            \begin{center}\small
+                $\qquad \Downarrow$ {\footnotesize \texttt{tail(L, $t$), head(L, $h$)} $\rightarrow$ \texttt{L} $\equiv$ \texttt{[$h$ | $t$]}}
+            \end{center}
+            \item \texttt{last([X], X).}
+            \item \texttt{last([\_|T], X) :- last(T, X).}
+        \end{itemize}
+    \end{exampleblock}
+
+    \framebreak
+
+    \begin{block}{Predicate invention}\centering
+        see \ref{slide:pi}
+    \end{block}
+
+    \framebreak
+
+    \begin{block}{Hypotesis Testing}
+        Metagol assumes a logic solver is in place to test induced theories
+    \end{block}
+
+    \begin{exampleblock}{Alternatives}
+        \begin{itemize}
+            \item Prolog
+            \item Concurrent LP
+            \item Answer set programming (ASP)
+            \item[$\vdots$]
+        \end{itemize}
+    \end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{Issues}
+    \begin{itemize}
+        \item What about robustness w.r.t. unnecessary meta-rules?
+        \item Who's in charge of engineering meta-rules?
+        \item How usable is ILP in `programming in the large'?
+        \item Standard benchmarks / datasets?
+        \item How can one tune aspects of the algorithms?
+    \end{itemize}
 \end{frame}
 
 %===============================================================================
