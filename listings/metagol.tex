@@ -1,0 +1,29 @@
+\begin{algorithmic}\small
+    \Function{Metagol}{$B$, $E^+$, $E^-, C$}
+
+        \State $L :=  \{ \text{all heads of all clauses in} ~ B \}$
+
+        \State
+
+        \While{$Stack \equiv [\alert{H} \mid Tail]$} \Comment{while $Stack$ is not empty}
+            % \State $X \leftarrow head(Stack)$
+            \If{$\exists F \in State : mgu(\alert{H}, F) = \theta$}
+                \State $Stack \leftarrow Tail \cdot \theta$ \Comment{Pop}
+            \ElsIf{$\exists N \in Actions : \exists E \in post_{+}(N) : mgu(\alert{H}, E) = \theta$} \Comment{\alert{CP}}
+                %\State $Stack \leftarrow tail(Stack)\theta$
+                \State $Stack \leftarrow [pre(N), N \mid Tail] \cdot \theta$  \Comment{Pop; Push($N$); Push($pre(N)$)}
+            \ElsIf{$\alert{H} \equiv G_1 \wedge \ldots \wedge G_m$}
+                \State $Stack \leftarrow [G_1, \ldots, G_m \mid Tail]$ \Comment Pop, Push($G_1$), \ldots, Push($G_m$), \alert{CP}
+            \ElsIf{$\alert{H} \in Actions$}
+                \State $State \leftarrow apply(State, H)$
+                \State $Plan \leftarrow [H \mid Plan]$
+            \Else
+                \State \Return $\varnothing$ \Comment Failure
+            \EndIf
+        \EndWhile
+
+        \State
+
+        \State \Return reverse($Plan$) \Comment Success
+    \EndFunction
+\end{algorithmic}
