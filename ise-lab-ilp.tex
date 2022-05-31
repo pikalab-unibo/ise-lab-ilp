@@ -405,8 +405,68 @@
     \end{block}
 \end{frame}
 
-\begin{frame}
+\begin{frame}%[allowframebreaks]
+\frametitle{Key Properties of ILP algorithms}
+
+    \begin{itemize}
+        \item \alert{Robustness} w.r.t. noise (a.k.a. wrong examples or background knowledge)
+        \item \alert{Optimality} (a.k.a. minimality of the induced theory)
+        \item Support for \alert{infinite domains}
+        \item Support for \alert{recursion} in induced theories
+        \item Support for \alert{predicate invention}\ccite{Buntine88}
+    \end{itemize}
+\end{frame}
+
+\subsection{Meta-Interpretative Learning}
+
+\begin{frame}{Meta-Interpretative Learning\ccite{MuggletonLT15} (MIL)}
+    \begin{itemize}
+        \item Didactic, yet powerful approach, for ILP
+        %
+        \begin{itemize}
+            \item straightforward support for minimality, infinite domains, recursion, and predicate invention
+        \end{itemize}
+        
+        \vfill
+
+        \item leveraging on $2^{nd}$-order clauses (i.e. \alert{meta-rules}) as linguistic bias
+        %
+        \begin{itemize}
+            \item intuitive, and expressive means to control the search space
+        \end{itemize}
+        
+        \vfill
+
+        \item leveraging on a \alert{logic solver} to test hypotheses
+        %
+        \begin{itemize}
+            \item commonly, a meta-interpreter (as it is implemented on top of Prolog)
+        \end{itemize}
+
+        \vfill
+
+        \item most famous implementation is Metagol\ccite{Buntine88}
+        %
+        \begin{itemize}
+            \item coming with a Prolog-based implementation\uurl{https://github.com/metagol/metagol}
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Formal Metagol (reverse-engineered\ccite{Cropper2020a})}
     \input{listings/metagol.tex}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Metagol Example -- Induce \pl{grand\_parent/2}}
+    \prologimport{listings/grandparent-input.pl}
+    \framebreak
+    \prologimport[basicstyle=\scriptsize\ttfamily]{listings/grandparent-execution.pl}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Metagol Example -- Induce \pl{last/2}}
+    \prologimport{listings/last-input.pl}
+    \framebreak
+    \prologimport[basicstyle=\scriptsize\ttfamily]{listings/last-execution.pl}
 \end{frame}
 
 %===============================================================================

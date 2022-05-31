@@ -19,7 +19,7 @@
                     \EndIf
                     \State $m := m / \theta$
                     \For{$l \in \mathit{body}(m)$}
-                        \If{$l$ has no meta-variable} 
+                        \If{$l$ has no meta-variable or is ground} 
                             \textbf{continue}
                         \EndIf
                         \State $p$ $:=$ any predicate in $L$ s.t. $\mathit{mgu}(l, p) = \sigma$ 
@@ -30,11 +30,10 @@
                         \EndIf
                         \State $m := m / \sigma$
                     \EndFor
-                    \State $m$ $:=$ \Call{Generalize}{$m$}
-                    \State $H := H \cup \{ m \}$ 
+                    \State $H := H \cup \{ \Call{Generalize}{$m$} \}$ 
                 \EndWhile
             \EndFor
-            \If{$(\not\exists e \in E^- : (H, B) \models e) \wedge (\forall e in E^+ : (H, B) \models e)$}
+            \If{$(\not\exists e \in E^- : (H, B) \models e) \wedge (\forall e \in E^+ : (H, B) \models e)$}
                 \State \Return $H$
             \EndIf
         \EndFor
