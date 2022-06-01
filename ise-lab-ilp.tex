@@ -14,7 +14,7 @@
 % version
 \newcommand{\versionmajor}{1}
 \newcommand{\versionminor}{0}
-\newcommand{\versionpatch}{0}
+\newcommand{\versionpatch}{1}
 \newcommand{\version}{\versionmajor.\versionminor.\versionpatch}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title[\currentLab{} -- Symbolic ML \& ILP]{
@@ -128,6 +128,12 @@
             \item Aims at learning a \alert{relation from examples} (supervised)
             \item The learnt relation is a \alert{logic program} (symbolic)
             \item May learn \alert{intensional} representations too
+            \item Has analogies and overlaps with
+            %
+            \begin{itemize}
+                \item (automatic) program synthesis
+                \item probabilistic logic programming\ccite{Ng1992}
+            \end{itemize}
             \item Two major (partially overlapping) branches:
             %
             \begin{itemize}
@@ -200,7 +206,7 @@
     %
     \begin{exampleblock}{Here the goal is \textbf{inducing} the theory}
         \begin{itemize}
-            \item \prolog{grand_parent(X, Y) :- grand_parent(X, Z), grand_parent(Z, Y).}
+            \item \prolog{grand_parent(X, Y) :- parent(X, Z), parent(Z, Y).}
         \end{itemize}
     \end{exampleblock}
 \end{frame}
@@ -398,8 +404,8 @@
 
     \begin{block}{Meta-Interpretative Learning \cite{MuggletonLPT14}}
         \begin{itemize}
-            \item Exploration strategy: bottom-up
-            \item Basic mechanism: \alert{generate and test} + (Prolog) \alert{meta-interpreter}
+            \item Exploration strategy: bottom-up + top-down
+            \item Basic mechanism: \alert{generate and test} + \alert{meta-interpreter} +
             \item Example algorithms: Metagol\ccite{MuggletonLT15}
         \end{itemize}
     \end{block}
@@ -427,20 +433,20 @@
 
     \begin{block}{Insight}
         \begin{itemize}
-            \item \textbf{What:} inventing \emph{auxiliary} predicate symbols
+            \item \textbf{What:} \alert{inventing} \emph{auxiliary} predicate symbols
             %
             \begin{itemize}
-                \item different from those used by positive examples
+                \item different from those used within the background knowledge
             \end{itemize}
-            \item \textbf{Why:} code reuse, improving readability of induced theories
-            \item \textbf{When:} either during induction or after it
+            \item \textbf{Why:} \alert{code reuse}, improving readability of induced theories
+            \item \textbf{When:} either \alert{during} induction or \alert{after} it
             \item \textbf{How:} multiple strategies (see below)
         \end{itemize}
     \end{block}
 
 \end{frame}
 
-\begin{frame}{Example -- Grouping Common Literals}
+\begin{frame}{Predicate Invention by Grouping Common Literals}
 
     \begin{block}{Theory without predicate invention}%\scriptsize
         \begin{itemize}
@@ -459,7 +465,7 @@
 
 \end{frame}
 
-\begin{frame}{Example -- Grouping Non-Common Literals}
+\begin{frame}{Predicate Invention by Grouping Non-Common Literals}
 
     \begin{block}{Theory without predicate invention}%\scriptsize
         \begin{itemize}
@@ -630,7 +636,7 @@
         Rewriting clauses to make them more user-friendly
     \end{block}
 
-    \begin{exampleblock}{Example}\scriptsize
+    \begin{exampleblock}{Example}
         \begin{itemize}
             \item \texttt{last(L, X) :- tail(L, []), head(L, X).}
             \item \texttt{last(L, X) :- tail(L, T), last(T, X).}
@@ -668,11 +674,11 @@
 
 \begin{frame}{Issues}
     \begin{itemize}
-        \item What about robustness w.r.t. unnecessary meta-rules?
-        \item Who's in charge of engineering meta-rules?
-        \item How usable is ILP in `programming in the large'?
-        \item Standard benchmarks / datasets?
-        \item How can one tune aspects of the algorithms?
+        \item What about robustness w.r.t. \alert{unnecessary meta-rules}?
+        \item Who's in charge of \alert{engineering meta-rules}?
+        \item How is ILP \alert{interoperable} with mainstream software platform/languages?
+        \item Standard \alert{benchmarks / datasets}?
+        \item How can one \alert{tune aspects} of the algorithms?
     \end{itemize}
 \end{frame}
 
